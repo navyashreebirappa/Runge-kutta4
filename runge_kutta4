@@ -1,0 +1,51 @@
+//runge-kutta algorithm
+// RK4.M
+function [T,Y] =RK4(yprime,tspan,h,y0)
+T(1) = tspan(1);
+Y(1) = y0;
+n=1;
+while T(n)<tspan(2)
+    T(n+1) =T(n)+h;
+    k1 = h*yprime(T(n),Y(n));
+    k2 = h*yprime(T(n)+ h/2,Y(n)+(1/2)*k1);
+    k3 = h*yprime(T(n)+ h/2,Y(n)+(1/2)*k2);
+    k4 = h*yprime(T(n)+ h,Y(n)+k3);
+    Y(n+1) = Y(n) + (1/6)*(k1+2*k2+2*k3+k4);
+    n=n+1;
+end
+
+//yprime.M:
+function yprime= yprime(t,y)
+yprime = t*(y+1);
+
+//yexact.M:
+function yexact= yexact(t)
+yexact = 3*exp(t/2)-1;
+
+//RK_Main.M:
+clear;
+h = [1.0 0.5];
+[T,Y] = RK4(@yprime,[0,3],1.0,1);
+plot(T,Y,'b');
+[T,Y] = RK4(@yprime,[0,3],0.5,1);
+hold on;
+plot(T,Y,'r');
+t = 0 :0.5:3;
+plot(t,yexact(t),'k');
+grid on;
+title('Analytical and Numerical Solution of dy/dt = t*(y+1)');
+xlabel('t');
+ylabel('y');
+legend('h=1.0', 'h=0.5', 'Analytical Solution');
+
+//To compare with forward and improved Euler method
+//compare.M
+clear;
+x = -3:0.01:2;
+plot(x,1+x,'r',x,1+x+(1/2)*x.^2,'g',x,1+x+(1/2)*x.^2+(1/6)*x.^3+(1/24)*x.^4,'b');
+title('Stability Intervals');
+xlabel('h\lambda');
+ylabel('f(h\lambda)');
+legend('Forward Euler method','Improved Euler method','RK4');
+
+
